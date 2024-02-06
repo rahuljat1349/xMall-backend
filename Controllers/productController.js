@@ -1,6 +1,7 @@
 const Product = require("../models/productModel");
 const mongoose = require("mongoose");
 
+
 // Handle Wrong mongoDB error
 const isValidProductId = (productId, res) => {
   if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -102,7 +103,7 @@ exports.updateProducts = async (req, res) => {
   }
 };
 
-// Delete product
+// Delete product -- Admin
 exports.deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
