@@ -1,11 +1,12 @@
 const Product = require("../models/productModel");
 const mongoose = require("mongoose");
 
+// Handle Wrong mongoDB error
 const isValidProductId = (productId, res) => {
   if (!mongoose.Types.ObjectId.isValid(productId)) {
     res.status(400).json({
       success: false,
-      message: "Invalid product ID format.",
+      message: "Resource not found.",
     });
     return false;
   }
@@ -21,10 +22,9 @@ exports.createProduct = async (req, res, next) => {
       product,
     });
   } catch (error) {
-    console.error("Error creating product:", error);
     res.status(500).json({
       success: false,
-      error: "Internal Server Error",
+      error: error.message,
     });
   }
 };
@@ -35,10 +35,9 @@ exports.getAllProducts = async (req, res) => {
     const products = await Product.find();
     res.status(200).json({ success: true, products });
   } catch (error) {
-    console.error("Error fetching products:", error);
     res.status(500).json({
       success: false,
-      error: "Internal Server Error",
+      error: error.message,
     });
   }
 };
@@ -63,10 +62,9 @@ exports.getProductDetails = async (req, res) => {
 
     res.status(200).json({ success: true, product });
   } catch (error) {
-    console.error("Error fetching product details:", error);
     res.status(500).json({
       success: false,
-      error: "Internal Server Error",
+      error: error.message,
     });
   }
 };
@@ -97,10 +95,9 @@ exports.updateProducts = async (req, res) => {
 
     res.status(200).json({ success: true, product });
   } catch (error) {
-    console.error("Error updating product:", error);
     res.status(500).json({
       success: false,
-      error: "Internal Server Error",
+      error: error.message,
     });
   }
 };
@@ -126,10 +123,9 @@ exports.deleteProduct = async (req, res) => {
     await product.deleteOne();
     res.status(200).json({ success: true, message: "Product deleted." });
   } catch (error) {
-    console.error("Error deleting product:", error);
     res.status(500).json({
       success: false,
-      error: "Internal Server Error",
+      error: error.message,
     });
   }
 };
