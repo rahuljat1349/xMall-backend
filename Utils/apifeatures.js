@@ -39,8 +39,7 @@ exports.searchAndFilterProducts = async (req, res) => {
     const totalProducts = await Product.countDocuments(filter);
     const totalPages = Math.ceil(totalProducts / pageSize);
 
-    let products = await Product.find(filter);
-
+    let products = await Product.find(filter).skip(skip).limit(pageSize);
 
     res.json({
       products,
