@@ -1,5 +1,6 @@
 const Product = require("../models/productModel");
 const mongoose = require("mongoose");
+const isAuthenticated = require("../Middlewares/isAuthenticated")
 
 
 // Handle Wrong mongoDB error
