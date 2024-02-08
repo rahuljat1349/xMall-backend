@@ -13,7 +13,7 @@ const router = express.Router();
 
 router
   .route("/products")
-  .get(isAuthenticated, authorizeRoles("admin"), getAllProducts);
+  .get(getAllProducts);
 
 router   
   .route("/product/new")
