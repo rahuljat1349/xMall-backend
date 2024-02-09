@@ -130,3 +130,120 @@ exports.deleteProduct = async (req, res) => {
     });
   }
 };
+
+// Create or Update review
+exports.createProductReview = async (req, res, next) => {
+  try {
+    const { rating, comment, productId } = req.body;
+    const review = {
+      user: req.user._id,
+      name: req.user.name,
+      ratings: Number(rating),
+      comment,
+    };
+
+    const product = await Product.findById(productId);
+    const isReviewd = await product.reviews.find(
+      (rev) => rev.user.toString() === req.user._id.toString()
+    );
+    if (isReviewd) {
+      product.reviews.forEach((rev) => {
+        if (rev.user.toString() === req.user._id.toString()) {
+          (rev.rating = rating), (rev.comment = comment);
+        }
+      });
+    } else {
+      await product.reviews.push(review);
+      product.numOfReviews = product.reviews.length;
+    }
+    let avg = 0;
+
+    product.reviews.forEach((rev) => (avg += rev.rating));
+    product.ratings = avg / product.reviews.length;
+
+    await product.save({ validateBeforeSave: false });
+
+    res.status(200).json({
+      success: true,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+// get all reviews
+exports.getProductReviews = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.query.id);
+    if (!product) {
+      return res.status(404).json({
+        message: "product not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      reviews: product.reviews,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+// delete review
+exports.deleteReview = async (req, res, next) => {
+  try {
+    const productId = req.query.productId;
+    const reviewId = req.query.id;
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({
+        message: "Product not found",
+      });
+    }
+
+    // Filter out the review to be deleted
+    const updatedReviews = product.reviews.filter(
+      (rev) => rev._id.toString() !== reviewId.toString()
+    );
+
+    // Recalculate average rating
+    let avg = 0;
+    if (updatedReviews.length > 0) {
+      updatedReviews.forEach((rev) => (avg += rev.rating));
+      avg /= updatedReviews.length;
+    }
+
+    // Update product with the new reviews and ratings
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      {
+        reviews: updatedReviews,
+        ratings: isNaN(avg) ? 0 : avg, // Set to 0 if avg is NaN
+        numOfReviews: updatedReviews.length,
+      },
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Review deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+

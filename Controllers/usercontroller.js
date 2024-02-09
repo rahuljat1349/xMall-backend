@@ -78,6 +78,7 @@ exports.getUserDetails = async (req, res, next) => {
       success: true,
       user,
     });
+    next();
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -85,6 +86,7 @@ exports.getUserDetails = async (req, res, next) => {
     });
   }
 };
+
 //  Update User Password
 
 exports.UpdatePassword = async (req, res, next) => {
@@ -112,14 +114,136 @@ exports.UpdatePassword = async (req, res, next) => {
       success: true,
       message: "password updated successfully",
     });
+    next();
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
     });
   }
-  next();
 };
+//  Update User Profile
+
+exports.UpdateProfile = async (req, res, next) => {
+  try {
+    const newUserData = {
+      name: req.body.name,
+      email: req.body.email,
+    };
+    // TODO - cloudinary
+    const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
+    res.status(200).json({
+      success: true,
+    });
+    next();
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Get All Users --Admin
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find();
+    res.status(200).json({
+      success: true,
+      users,
+    });
+    next();
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Get Sigle User Details -- Admin
+
+exports.getSingleUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        message: `user does not exist with id ${req.params.id}`,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      user,
+    });
+    next();
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Update User Role -- Admin
+
+exports.UpdateUserRole = async (req, res, next) => {
+  try {
+    const newUserData = {
+      name: req.body.name,
+      email: req.body.email,
+      role: req.body.role,
+    };
+    const user = await User.findByIdAndUpdate(req.params.id, newUserData, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
+    if (!user) {
+      return res.status(404).json({
+        message: `user does not exist with id ${req.params.id}`,
+      });
+    }
+    res.status(200).json({
+      success: true,
+    });
+    next();
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Delete User --Admin
+
+exports.deleteUser = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        message: `user does not exist with id ${req.params.id}`,
+      });
+    }
+    // TODO -- remove cloudinary
+    res.status(200).json({
+      success: true,
+    });
+    next();
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+//
+
+//
 
 // Forgot password
 
