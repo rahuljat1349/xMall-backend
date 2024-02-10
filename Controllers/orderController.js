@@ -101,47 +101,55 @@ exports.getAllOrders = async (req, res, next) => {
     });
   }
 };
-
-// Uodate Order status -- Admin
+// Update Order status -- Admin
 exports.updateOrderStatus = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);
 
     if (!order) {
       return res.status(404).json({
-        message: "order not found",
+        message: "Order not found",
       });
     }
     if (order.orderStatus === "Delivered") {
       return res.status(400).json({
-        message: "You Have Already Delivered this Product.",
+        message: "You have already delivered this product.",
       });
     }
-    order.orderItems.forEach(async (order) => {
-      await updateStock(order.product, order.orderItems.quantity);
+    order.orderItems.forEach(async (orderItem) => {
+      await updateStock(orderItem.product, orderItem.quantity);
     });
     order.orderStatus = req.body.status;
     if (req.body.status === "Delivered") {
       order.deliveredAt = Date.now();
     }
+    await order.save({ validateBeforeSave: false });
+
     res.status(200).json({
       success: true,
       order,
     });
-    await order.save({ validateBeforeSave: false });
   } catch (error) {
     res.status(500).json({
       error: error.message,
     });
   }
 };
+
 // function for update stock
 let updateStock = async (id, quantity) => {
   try {
     const product = await Product.findById(id);
+    if (!product) {
+       throw new Error("Product not found");
+    }
     product.stock -= quantity;
     await product.save({ validateBeforeSave: false });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({
+      message:error.message
+    })
+  }
 };
 
 // Delete Order -- Admin
