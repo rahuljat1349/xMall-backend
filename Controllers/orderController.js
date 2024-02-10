@@ -141,14 +141,14 @@ let updateStock = async (id, quantity) => {
   try {
     const product = await Product.findById(id);
     if (!product) {
-       throw new Error("Product not found");
+      throw new Error("Product not found");
     }
     product.stock -= quantity;
     await product.save({ validateBeforeSave: false });
   } catch (error) {
     res.status(500).json({
-      message:error.message
-    })
+      message: error.message,
+    });
   }
 };
 
