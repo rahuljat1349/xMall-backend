@@ -19,6 +19,8 @@ router.route("/products").get(getAllProducts);
 router
   .route("/admin/product/new")
   .post(isAuthenticated, authorizeRoles("admin"), createProduct);
+
+  
 router.route("/products/search/").get(searchAndFilterProducts);
 
 router
