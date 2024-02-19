@@ -14,7 +14,7 @@ const { searchAndFilterProducts } = require("../Utils/apifeatures");
 
 const router = express.Router();
 
-router.route("/products").get(getAllProducts);
+router.route("/products").get(searchAndFilterProducts);
 
 router
   .route("/admin/product/new")
