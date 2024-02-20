@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    unique:true,
+    unique: true,
     required: [true, "Please Enter Your Email"],
     validate: [validator.isEmail, "Please Enter a valid Email"],
   },
@@ -18,8 +18,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please Enter a password"],
     minLength: [8, "Password should be greater than 8n characters"],
-    select:false
-
+    select: false,
   },
   avatar: {
     public_id: {
@@ -34,6 +33,10 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     default: "user",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
