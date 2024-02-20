@@ -9,7 +9,7 @@ exports.searchAndFilterProducts = async (req, res) => {
     const minPrice = req.query.minPrice;
     const maxPrice = req.query.maxPrice;
     const page = parseInt(req.query.page) || 1; // default to page 1
-    const pageSize = parseInt(req.query.pageSize) ; // default to 10 items per page
+    const pageSize = parseInt(req.query.pageSize) || 12; // default to 10 items per page
 
     // Build the filter object based on the provided query parameters
     const filter = {};
@@ -39,9 +39,7 @@ exports.searchAndFilterProducts = async (req, res) => {
     const totalProducts = await Product.countDocuments(filter);
     const totalPages = Math.ceil(totalProducts / pageSize);
 
-    let products = await Product.find(filter)
-    // .skip(skip);
-    .limit(pageSize);
+    let products = await Product.find(filter).skip(skip).limit(pageSize);
 
     res.json({
       products,
