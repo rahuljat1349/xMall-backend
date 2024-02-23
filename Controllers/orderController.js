@@ -100,7 +100,7 @@ exports.getAllOrders = async (req, res, next) => {
       error: error.message,
     });
   }
-};
+}; 
 // Update Order status -- Admin
 exports.updateOrderStatus = async (req, res, next) => {
   try {
