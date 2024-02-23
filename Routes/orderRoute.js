@@ -10,9 +10,7 @@ const {
 } = require("../Controllers/orderController");
 const router = express.Router();
 
-router
-  .route("/order/new/")
-  .post(isAuthenticated, authorizeRoles("admin"), newOrder);
+router.route("/order/new/").post(isAuthenticated, newOrder);
 router.route("/orders/me/").get(isAuthenticated, myOrders);
 router
   .route("/admin/order/:id")
