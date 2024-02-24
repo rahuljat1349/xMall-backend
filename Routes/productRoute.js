@@ -15,6 +15,7 @@ const { searchAndFilterProducts } = require("../Utils/apifeatures");
 const router = express.Router();
 
 router.route("/products").get(searchAndFilterProducts);
+router.route("/admin/products").get(isAuthenticated,authorizeRoles("admin"),getAllProducts);
 
 router
   .route("/admin/product/new")

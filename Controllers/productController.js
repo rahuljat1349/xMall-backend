@@ -1,5 +1,6 @@
 const Product = require("../models/productModel");
 const mongoose = require("mongoose");
+const cloudinary = require("cloudinary");
 
 // Handle Wrong mongoDB error
 const isValidProductId = (productId, res) => {
@@ -16,6 +17,23 @@ const isValidProductId = (productId, res) => {
 // Create Product -- Admin
 exports.createProduct = async (req, res, next) => {
   try {
+    let images = [];
+    if (typeof req.body.images === "string") {
+      images.push(req.body.images);
+    } else {
+      images = req.body.images;
+    }
+    const imagesLink = [];
+    for (let i = 0; i < images.length; i++) {
+      const result = await cloudinary.v2.uploader.upload(images[i], {
+        folder: "products",
+      });
+      imagesLink.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
+    req.body.images = imagesLink;
     req.body.user = req.user.id;
     const product = await Product.create(req.body);
     res.status(201).json({
@@ -31,7 +49,7 @@ exports.createProduct = async (req, res, next) => {
 };
 
 // Get All Products
-exports.getAllProducts = async (req, res) => {
+exports.getAllProducts = async (req, res, next) => {
   try {
     const products = await Product.find();
     res.status(200).json({ success: true, products });
@@ -246,4 +264,3 @@ exports.deleteReview = async (req, res, next) => {
     });
   }
 };
-
