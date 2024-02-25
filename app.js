@@ -4,10 +4,10 @@ const bodyParser = require("body-parser");
 const fileupload = require("express-fileupload");
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileupload());
-app.use(cors());
 
 // Route imports
 const productRoute = require("./Routes/productRoute");

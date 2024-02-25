@@ -100,7 +100,7 @@ exports.getAllOrders = async (req, res, next) => {
       error: error.message,
     });
   }
-}; 
+};
 // Update Order status -- Admin
 exports.updateOrderStatus = async (req, res, next) => {
   try {
@@ -116,9 +116,11 @@ exports.updateOrderStatus = async (req, res, next) => {
         message: "You have already delivered this product.",
       });
     }
-    order.orderItems.forEach(async (orderItem) => {
-      await updateStock(orderItem.product, orderItem.quantity);
-    });
+    if (req.body.status === "Shipped") {
+      order.orderItems.forEach(async (orderItem) => {
+        await updateStock(res, orderItem.product, orderItem.quantity);
+      });
+    }
     order.orderStatus = req.body.status;
     if (req.body.status === "Delivered") {
       order.deliveredAt = Date.now();
@@ -137,7 +139,7 @@ exports.updateOrderStatus = async (req, res, next) => {
 };
 
 // function for update stock
-let updateStock = async (id, quantity) => {
+let updateStock = async ( id, quantity) => {
   try {
     const product = await Product.findById(id);
     if (!product) {
@@ -146,9 +148,7 @@ let updateStock = async (id, quantity) => {
     product.stock -= quantity;
     await product.save({ validateBeforeSave: false });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    
   }
 };
 
