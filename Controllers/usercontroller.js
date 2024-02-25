@@ -197,7 +197,7 @@ exports.UpdateUserRole = async (req, res, next) => {
       email: req.body.email,
       role: req.body.role,
     };
-    const user = await User.findByIdAndUpdate(req.params.id, newUserData, {
+    let user = await User.findByIdAndUpdate(req.params.id, newUserData, {
       new: true,
       runValidators: true,
       useFindAndModify: false,
@@ -229,6 +229,7 @@ exports.deleteUser = async (req, res, next) => {
         message: `user does not exist with id ${req.params.id}`,
       });
     }
+
     // TODO -- remove cloudinary
     res.status(200).json({
       success: true,
