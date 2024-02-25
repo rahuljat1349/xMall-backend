@@ -17,6 +17,8 @@ const isValidProductId = (productId, res) => {
 // Create Product -- Admin
 exports.createProduct = async (req, res, next) => {
   try {
+    // console.log(req.files);
+    // res.send(req.files);
     let images = [];
     if (typeof req.body.images === "string") {
       images.push(req.body.images);
