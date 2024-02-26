@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileupload());
-
+// app.use(express.static("public"));
 // Route imports
 const productRoute = require("./Routes/productRoute");
 const userRoute = require("./Routes/userRoute");

@@ -1,13 +1,16 @@
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(
+  "sk_test_51OmbTCSAfvlVDoiIwv4AowRLx7MZISJQjbajLlsaWkRN2HrjsOOv5YSb04YDSoLbscWoqkidnjKhgHjru13xGICh00qlAa0sWV"
+);
 
 exports.processPayment = async (req, res, next) => {
   try {
     const myPayment = await stripe.paymentIntents.create({
       amount: req.body.amount,
-      currency: "inr",
+      currency: "usd",
       metadata: {
         company: "xMall",
       },
+      description: "Your payment description here",
     });
 
     if (!myPayment.client_secret) {
@@ -25,7 +28,7 @@ exports.processPayment = async (req, res, next) => {
 
 exports.sendStripeApiKey = async (req, res, next) => {
   try {
-    res.status(200).json({ stripeApiKey: process.env.STRIPE_API_KEY });
+    res.status(200).json({ stripeApiKey: process.env.STRIPE_PUBLIC_KEY });
   } catch (error) {
     res.status(500).json({
       error: error.message,
