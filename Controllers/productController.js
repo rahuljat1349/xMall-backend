@@ -1,8 +1,11 @@
 const Product = require("../models/productModel");
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary");
+const multer = require("multer");
+const storage = multer.memoryStorage(); 
+const upload = multer({ storage: storage });
 
-// Handle Wrong mongoDB error
+// Handle Wrong mongoDB Id error
 const isValidProductId = (productId, res) => {
   if (!mongoose.Types.ObjectId.isValid(productId)) {
     res.status(400).json({
@@ -15,17 +18,29 @@ const isValidProductId = (productId, res) => {
 };
 
 // Create Product -- Admin
-exports.createProduct = async (req, res, next) => {
+exports.createProduct = upload.array('images'), async (req, res, next) => {
   try {
-    // console.log(req.files);
-    // res.send(req.files);
+    console.log(req.files);
+    console.log(req.body);
+
     let images = [];
+
+    if (!req.files) {
+      // Handle the case where req.files is null or undefined
+      return res.status(400).json({
+        success: false,
+        error: "No files were provided.",
+      });
+    }
+
     if (typeof req.files === "string") {
       images.push(req.files);
     } else {
       images = req.files;
     }
+
     const imagesLink = [];
+
     for (let i = 0; i < images.length; i++) {
       const result = await cloudinary.v2.uploader.upload(images[i], {
         folder: "products",
@@ -36,20 +51,26 @@ exports.createProduct = async (req, res, next) => {
         url: result.secure_url,
       });
     }
+
     req.files = imagesLink;
     req.body.user = req.user.id;
+
     const product = await Product.create(req.body);
+
     res.status(201).json({
       success: true,
       product,
     });
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       error: error.message,
     });
   }
 };
+
 
 // Get All Products
 exports.getAllProducts = async (req, res, next) => {
