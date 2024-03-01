@@ -1,9 +1,6 @@
 const Product = require("../models/productModel");
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary");
-const multer = require("multer");
-const storage = multer.memoryStorage(); 
-const upload = multer({ storage: storage });
 
 // Handle Wrong mongoDB Id error
 const isValidProductId = (productId, res) => {
@@ -18,41 +15,8 @@ const isValidProductId = (productId, res) => {
 };
 
 // Create Product -- Admin
-exports.createProduct = upload.array('images'), async (req, res, next) => {
+exports.createProduct = async (req, res, next) => {
   try {
-    console.log(req.files);
-    console.log(req.body);
-
-    let images = [];
-
-    if (!req.files) {
-      // Handle the case where req.files is null or undefined
-      return res.status(400).json({
-        success: false,
-        error: "No files were provided.",
-      });
-    }
-
-    if (typeof req.files === "string") {
-      images.push(req.files);
-    } else {
-      images = req.files;
-    }
-
-    const imagesLink = [];
-
-    for (let i = 0; i < images.length; i++) {
-      const result = await cloudinary.v2.uploader.upload(images[i], {
-        folder: "products",
-      });
-      console.log(result);
-      imagesLink.push({
-        public_id: result.public_id,
-        url: result.secure_url,
-      });
-    }
-
-    req.files = imagesLink;
     req.body.user = req.user.id;
 
     const product = await Product.create(req.body);
@@ -70,7 +34,6 @@ exports.createProduct = upload.array('images'), async (req, res, next) => {
     });
   }
 };
-
 
 // Get All Products
 exports.getAllProducts = async (req, res, next) => {
@@ -129,33 +92,7 @@ exports.updateProducts = async (req, res) => {
         message: "Product not found.",
       });
     }
-    let images = [];
-    if (typeof req.files === "string") {
-      images.push(req.files);
-    } else {
-      images = req.files;
-    }
-    if (images !== undefined) {
-      // deleting images from cloudinary
-      for (let i = 0; i < product.images.length; i++) {
-        const result = await cloudinary.v2.uploader.destroy(
-          product.images[i].public_id
-        );
-      }
-
-      const imagesLink = [];
-      for (let i = 0; i < images.length; i++) {
-        const result = await cloudinary.v2.uploader.upload(images[i], {
-          folder: "products",
-        });
-        console.log(result);
-        imagesLink.push({
-          public_id: result.public_id,
-          url: result.secure_url,
-        });
-      }
-      req.files = imagesLink;
-    }
+  
     product = await Product.findByIdAndUpdate(productId, req.body, {
       new: true,
       runValidators: true,
