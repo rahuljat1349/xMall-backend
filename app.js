@@ -3,9 +3,14 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const fileupload = require("express-fileupload");
 const app = express();
-
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:3000", // Replace with your frontend's URL
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true, // Enable cookies and credentials for cross-origin requests
+};
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileupload());
