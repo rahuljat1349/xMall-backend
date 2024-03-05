@@ -12,6 +12,7 @@ exports.newOrder = async (req, res, next) => {
       shippingPrice,
       totalPrice,
     } = req.body;
+    // console.log(req.body);
     const order = await Order.create({
       shippingInfo,
       orderItems,
@@ -139,7 +140,7 @@ exports.updateOrderStatus = async (req, res, next) => {
 };
 
 // function for update stock
-let updateStock = async ( id, quantity) => {
+let updateStock = async (id, quantity) => {
   try {
     const product = await Product.findById(id);
     if (!product) {
@@ -147,9 +148,7 @@ let updateStock = async ( id, quantity) => {
     }
     product.stock -= quantity;
     await product.save({ validateBeforeSave: false });
-  } catch (error) {
-    
-  }
+  } catch (error) {}
 };
 
 // Delete Order -- Admin
