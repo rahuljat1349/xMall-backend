@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const fileupload = require("express-fileupload");
 const app = express();
 const corsOptions = {
-  origin: "https://x-mall-react.vercel.app", // Replace with your frontend's URL
+  origin: "*", // Replace with your frontend's URL
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true, // Enable cookies and credentials for cross-origin requests
 };
